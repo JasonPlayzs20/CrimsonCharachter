@@ -68,7 +68,7 @@ useNativeTransport:true
 mainHand:"right"
 attackIndicator:1
 narrator:0
-tutorialStep:movement
+tutorialStep:none
 mouseWheelSensitivity:1.0
 rawMouseInput:true
 glDebugVerbosity:1
@@ -122,7 +122,7 @@ key_key.origins.primary_active:key.keyboard.g
 key_key.origins.secondary_active:key.keyboard.unknown
 key_key.origins.view_origin:key.keyboard.o
 soundCategory_master:1.0
-soundCategory_music:1.0
+soundCategory_music:0.0
 soundCategory_record:1.0
 soundCategory_weather:1.0
 soundCategory_block:1.0

@@ -33,7 +33,10 @@ public class ModItems {
     public static final Item moartelafoc = register(new SwordItem(MoartelafocMaterial.INSTANCE,8,-2.2F,new FabricItemSettings()), "moartelafoc_sword");
     public static final Item prokletikamen = register(new SwordItem(ProkletikamenMaterial.INSTANCE,9,-2.2F,new FabricItemSettings()),"prokletikamen_sword");
 
-    public static final Item emberheartFragment = register(new Item(new FabricItemSettings()),"emberheart_fragment");
+    public static final Item heartOfEarth = register(new Item(new FabricItemSettings()),"heart_of_earth");
+    public static final Item coreOfIronflame = register(new Item(new FabricItemSettings()),"core_of_iron_flame");
+    public static final Item crystalOfAscension = register(new Item(new FabricItemSettings()),"crystal_of_ascension");
+    public static final Item netherheartCatalyst = register(new Item(new FabricItemSettings()),"netherheart_catalyst");
 
 
     public static void initialize() {
@@ -44,6 +47,10 @@ public class ModItems {
             itemgroup.add(infernuferreus);
             itemgroup.add(moartelafoc);
             itemgroup.add(prokletikamen);
+            itemgroup.add(heartOfEarth);
+            itemgroup.add(coreOfIronflame);
+            itemgroup.add(crystalOfAscension);
+            itemgroup.add(netherheartCatalyst);
         });
     }
 }
