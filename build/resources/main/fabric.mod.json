@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "tsukiaddon",
+  "version": "1.0-SNAPSHOT",
+  "name": "TsukiAddon",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/tsukiaddon/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "org.jason.tsukiaddon.client.TsukiaddonDataGenerator"
+    ],
+    "client": [
+      "org.jason.tsukiaddon.client.TsukiaddonClient"
+    ],
+    "main": [
+      "org.jason.tsukiaddon.Tsukiaddon"
+    ]
+  },
+  "mixins": [
+    "tsukiaddon.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.17.2",
+    "fabric": "*",
+    "minecraft": "1.20.1"
+  }
+}
