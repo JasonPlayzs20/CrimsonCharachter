@@ -47,7 +47,7 @@ public class PlayerItemModelMixin {
                 }
                 if (Objects.equals(e.getKey(), "Item")) {
                     float[] movements = e.getValue();
-                    matrices.multiply(RotationAxis.POSITIVE_X.rotation(movements[0]-handRotation[0]));
+                    matrices.multiply(RotationAxis.POSITIVE_X.rotation(movements[0]+handRotation[0]));
                     matrices.multiply(RotationAxis.POSITIVE_Z.rotation(movements[1]-handRotation[1]));
                     matrices.multiply(RotationAxis.POSITIVE_Y.rotation(movements[2]-handRotation[2]));
                 }

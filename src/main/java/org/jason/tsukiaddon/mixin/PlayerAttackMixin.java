@@ -17,10 +17,10 @@ public class PlayerAttackMixin {
 
     @Inject(method = "attack(Lnet/minecraft/entity/Entity;)V", at = @At("TAIL"))
     private void onAttack(Entity target, CallbackInfo ci) {
-        System.out.println("mixed");
+//        System.out.println("mixed");
 
         PlayerEntity player = (PlayerEntity) (Object) this;
-        System.out.println("Attack mixin triggered! Target = " + target);
+//        System.out.println("Attack mixin triggered! Target = " + target);
 
         if (player.getMainHandStack().getItem() == ModItems.adamysticus) {
             if (!player.getWorld().isClient && player instanceof ServerPlayerEntity serverPlayer) {

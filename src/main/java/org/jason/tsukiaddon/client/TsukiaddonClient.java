@@ -17,6 +17,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -95,14 +96,24 @@ public class TsukiaddonClient implements ClientModInitializer {
             WeaponRegistry.registerWeapons();
         });
 
-//        ClientPlayNetworking.registerGlobalReceiver(AnimationPackets.PLAY_ANIMATION, (client, handler, buf, responseSender) -> {
-//            UUID playerUUID = buf.readUuid();
-//            int comboCount = buf.readInt();
-//
-//            client.execute(() -> {
-//                ComboAttackSystem.registerAttack(playerUUID);
-//            });
-//        });
+        ClientPlayNetworking.registerGlobalReceiver(AnimationPackets.PLAY_ANIMATION, (client, handler, buf, responseSender) -> {
+            UUID playerUUID = buf.readUuid();
+            int comboCount = buf.readInt();
+
+            client.execute(() -> {
+                if (client.world != null) {
+                    // Get player by UUID
+                    net.minecraft.entity.player.PlayerEntity targetPlayer = client.world.getPlayerByUuid(playerUUID);
+
+                    if (targetPlayer != null) {
+                        ItemStack weapon = targetPlayer.getMainHandStack();
+                        if (WeaponComboConfig.hasCombo(weapon.getItem())) {
+                            ComboAttackSystem.registerAttack(playerUUID, weapon.getItem(),false);
+                        }
+                    }
+                }
+            });
+        });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;

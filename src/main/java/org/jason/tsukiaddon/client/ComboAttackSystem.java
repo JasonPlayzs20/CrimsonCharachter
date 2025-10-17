@@ -10,33 +10,34 @@ import java.util.UUID;
 public class ComboAttackSystem {
     private static final Map<UUID, ComboState> combos = new HashMap<>();
 
-    public static void registerAttack(UUID playerUUID, Item weapon) {
+    public static void registerAttack(UUID playerUUID, Item weapon,boolean count) {
         WeaponComboConfig.ComboConfig config = WeaponComboConfig.getConfig(weapon);
         if (config == null) return; // No combo configured for this weapon
 
+//        AnimationSystem.stopAnimation(playerUUID);
+
         ComboState state = combos.get(playerUUID);
         long now = System.currentTimeMillis();
-
+//        System.out.println("Good day");
         if (state == null) {
-            // First attack
             state = new ComboState(config);
             state.comboCount = 1;
             state.lastAttackTime = now;
             combos.put(playerUUID, state);
             AnimationSystem.playAnimation(playerUUID, config.getAttackAnimation(1));
         } else {
-            // Check if we're within combo window
             if (now - state.lastAttackTime <= config.getComboWindow()) {
-                // Continue combo
-                state.comboCount++;
+                if (count) {
+                    state.comboCount++;
+                }
                 if (state.comboCount > config.getMaxCombo()) {
-                    state.comboCount = 1; // Reset to first attack
+                    state.comboCount = 1;
                 }
                 state.lastAttackTime = now;
                 state.sheathePending = false;
                 AnimationSystem.playAnimation(playerUUID, config.getAttackAnimation(state.comboCount));
             } else {
-                // Combo expired, start new combo
+
                 state.comboCount = 1;
                 state.lastAttackTime = now;
                 state.sheathePending = false;

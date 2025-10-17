@@ -27,11 +27,11 @@ public class ModItems {
 
 
 
-    public static final Item adamysticus = register(new SwordItem(AdamysticusMaterial.INSTANCE,5,-2.2F,new FabricItemSettings()),"adamysticus_sword");
-    public static final Item drevenavatra = register(new SwordItem(DrevenavatraMaterial.INSTANCE,6,-2.2F,new FabricItemSettings()),"drevenavatra_sword");
+    public static final Item adamysticus = register(new SwordItem(AdamysticusMaterial.INSTANCE,8,-2.2F,new FabricItemSettings()),"adamysticus_sword");
+    public static final Item drevenavatra = register(new SwordItem(DrevenavatraMaterial.INSTANCE,5,-2.2F,new FabricItemSettings()),"drevenavatra_sword");
     public static final Item infernuferreus = register(new SwordItem(InfernuferreusMaterial.INSTANCE,7,-2.2F,new FabricItemSettings()),"inferuferreus_sword");
-    public static final Item moartelafoc = register(new SwordItem(MoartelafocMaterial.INSTANCE,8,-2.2F,new FabricItemSettings()), "moartelafoc_sword");
-    public static final Item prokletikamen = register(new SwordItem(ProkletikamenMaterial.INSTANCE,9,-2.2F,new FabricItemSettings()),"prokletikamen_sword");
+    public static final Item moartelafoc = register(new SwordItem(MoartelafocMaterial.INSTANCE,9,-2.2F,new FabricItemSettings()), "moartelafoc_sword");
+    public static final Item prokletikamen = register(new SwordItem(ProkletikamenMaterial.INSTANCE,6,-2.2F,new FabricItemSettings()),"prokletikamen_sword");
 
     public static final Item heartOfEarth = register(new Item(new FabricItemSettings()),"heart_of_earth");
     public static final Item coreOfIronflame = register(new Item(new FabricItemSettings()),"core_of_iron_flame");

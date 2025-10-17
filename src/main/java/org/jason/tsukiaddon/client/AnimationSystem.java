@@ -68,7 +68,17 @@ public class AnimationSystem {
         }
     }
 
+    public static void stopAnimation(UUID playerUUID) {
+        activeAnimations.remove(playerUUID);
+        RenderHook.setModelPose(playerUUID, null);
+    }
 
+    public static void stopAllAnimations() {
+        for (UUID uuid : activeAnimations.keySet()) {
+            RenderHook.setModelPose(uuid, null);
+        }
+        activeAnimations.clear();
+    }
     private static class AnimationData {
         String name;
         int duration;

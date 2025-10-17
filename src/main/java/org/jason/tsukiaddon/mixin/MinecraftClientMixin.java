@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Text;
 import org.jason.tsukiaddon.client.ComboAttackSystem;
 import org.jason.tsukiaddon.client.WeaponComboConfig;
 import org.jason.tsukiaddon.items.ModItems;
@@ -21,13 +22,14 @@ public class MinecraftClientMixin {
     private void onDoAttack(CallbackInfoReturnable<Boolean> cir) {
         MinecraftClient client = (MinecraftClient) (Object) this;
         ClientPlayerEntity player = client.player;
+        player.sendMessage(Text.literal("hello"));
 
         if (player != null) {
             ItemStack weapon = player.getMainHandStack();
 
             if (WeaponComboConfig.hasCombo(weapon.getItem())) {
                 // Register attack in combo system with weapon
-                ComboAttackSystem.registerAttack(player.getUuid(), weapon.getItem());
+                ComboAttackSystem.registerAttack(player.getUuid(), weapon.getItem(),true);
 
                 // Send to server for multiplayer
                 PacketByteBuf buf = PacketByteBufs.create();
