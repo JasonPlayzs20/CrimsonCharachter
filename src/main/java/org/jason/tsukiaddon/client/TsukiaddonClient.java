@@ -10,8 +10,11 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.mixin.client.particle.ParticleManagerAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleTextureSheet;
@@ -41,11 +44,15 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import org.jason.tsukiaddon.WeaponRegistry;
 import org.jason.tsukiaddon.network.AnimationPackets;
+import org.jason.tsukiaddon.network.DataSyncPackets;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
+
+import static org.jason.tsukiaddon.network.DataSyncPackets.SYNC_PLAYER_DATA;
+import static org.jason.tsukiaddon.network.DataSyncPackets.UPDATE_PLAYER_DATA;
 
 
 public class TsukiaddonClient implements ClientModInitializer {
@@ -78,9 +85,12 @@ public class TsukiaddonClient implements ClientModInitializer {
         }
         return false;
     }
+
     public static KeyBinding PLAY_KEY;
+
     @Override
     public void onInitializeClient() {
+
         PLAY_KEY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.everflame.play",
                 InputUtil.Type.KEYSYM,
@@ -96,6 +106,19 @@ public class TsukiaddonClient implements ClientModInitializer {
             WeaponRegistry.registerWeapons();
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(SYNC_PLAYER_DATA, ((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
+            double bondOfLife = packetByteBuf.readDouble();
+//            System.out.println("hi");
+            minecraftClient.execute(() -> {
+//                System.out.println("Hi2");
+                PlayerDataHUD.updateBondOfLife(bondOfLife);
+                PlayerDataHUD.register();
+//                minecraftClient.;
+            });
+
+        }));
+        PlayerDataHUD.register();
+
         ClientPlayNetworking.registerGlobalReceiver(AnimationPackets.PLAY_ANIMATION, (client, handler, buf, responseSender) -> {
             UUID playerUUID = buf.readUuid();
             int comboCount = buf.readInt();
@@ -108,7 +131,7 @@ public class TsukiaddonClient implements ClientModInitializer {
                     if (targetPlayer != null) {
                         ItemStack weapon = targetPlayer.getMainHandStack();
                         if (WeaponComboConfig.hasCombo(weapon.getItem())) {
-                            ComboAttackSystem.registerAttack(playerUUID, weapon.getItem(),false);
+                            ComboAttackSystem.registerAttack(playerUUID, weapon.getItem(), false);
                         }
                     }
                 }
@@ -118,13 +141,14 @@ public class TsukiaddonClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
 
-//            if (PLAY_KEY.isPressed()) {
-//                // Send to server instead of playing directly
+            while (PLAY_KEY.wasPressed()) {
+                sendBondToServer(PlayerDataHUD.getBondOfLife() + 5);
 //                PacketByteBuf buf = PacketByteBufs.create();
 //                buf.writeUuid(client.player.getUuid());
 //                buf.writeString("test");
 //                ClientPlayNetworking.send(AnimationPackets.PLAY_ANIMATION, buf);
-//            }
+
+            }
 
             AnimationSystem.tick(client);
             ComboAttackSystem.tick(client);
@@ -132,5 +156,11 @@ public class TsukiaddonClient implements ClientModInitializer {
 
 
     }
+
+    public static void sendBondToServer(double bondOfLife) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeDouble(bondOfLife);
+        ClientPlayNetworking.send(UPDATE_PLAYER_DATA, buf);
     }
+}
 

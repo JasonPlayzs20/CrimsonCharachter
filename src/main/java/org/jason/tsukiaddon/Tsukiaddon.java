@@ -5,10 +5,13 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jason.tsukiaddon.client.PlayerDataHUD;
 import org.jason.tsukiaddon.items.ModItems;
 import org.jason.tsukiaddon.network.AnimationPackets;
 
 import java.util.UUID;
+
+import static org.jason.tsukiaddon.network.DataSyncPackets.UPDATE_PLAYER_DATA;
 
 public class Tsukiaddon implements ModInitializer {
     public static String MOD_ID = "tsukiaddon";
@@ -32,6 +35,15 @@ public class Tsukiaddon implements ModInitializer {
                 }
             });
         });
+
+        ServerPlayNetworking.registerGlobalReceiver(UPDATE_PLAYER_DATA, ((minecraftServer, serverPlayerEntity, serverPlayNetworkHandler, packetByteBuf, packetSender) -> {
+            double bondOfLife = packetByteBuf.readDouble();
+
+            StateSaverAndLoader stateSaverAndLoader = StateSaverAndLoader.getServerState(minecraftServer);
+            stateSaverAndLoader.setBondOfLife(serverPlayerEntity.getUuid(),bondOfLife);
+            PlayerDataHUD.updateBondOfLife(bondOfLife);
+
+        }));
 
     }
 }
