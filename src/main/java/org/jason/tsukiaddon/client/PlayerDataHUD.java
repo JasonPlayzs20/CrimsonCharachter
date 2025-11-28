@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 
 public class PlayerDataHUD {
     private static double bondOfLife = 10.0;
+    private static int energy = 0;
 
     public static void register() {
 //        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
@@ -24,8 +25,27 @@ public class PlayerDataHUD {
                     0xFF5555,
                     true
             );
+
+            String energyText = "Energy: " + energy;
+            drawContext.drawText(
+                    client.textRenderer,
+                    energyText,
+                    100,
+                    10,
+                    0xFF4444,
+                    true
+            );
+
         }));
 
+    }
+
+    public static void updateEnergy(int energyValue) {
+        energy = energyValue;
+    }
+
+    public static int getEnergy() {
+        return energy;
     }
 
     public static void updateBondOfLife(double bondOfLifen) {

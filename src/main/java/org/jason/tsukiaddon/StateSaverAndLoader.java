@@ -80,6 +80,7 @@ public class StateSaverAndLoader extends PersistentState {
 
     public static StateSaverAndLoader getServerState(MinecraftServer server) {
         ServerWorld overworld = server.getWorld(World.OVERWORLD);
+        assert overworld != null;
         return overworld.getPersistentStateManager().getOrCreate(
                 StateSaverAndLoader::fromNbt,
                 StateSaverAndLoader::new,
@@ -102,6 +103,11 @@ public class StateSaverAndLoader extends PersistentState {
 
     public void setPlayerEnergy(UUID player, int value) {
         playerEnergy.put(player,value);
+        markDirty();
+    }
+
+    public void addPlayerEnergy(UUID player, int value) {
+        playerEnergy.put(player,Math.min(playerEnergy.getOrDefault(player,0) + value, 60));
         markDirty();
     }
 

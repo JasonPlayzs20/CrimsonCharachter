@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import org.jason.tsukiaddon.StateSaverAndLoader;
 import org.jason.tsukiaddon.items.ModItems;
 import org.jason.tsukiaddon.network.AnimationPackets;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,6 +27,11 @@ public class PlayerAttackMixin {
             if (!player.getWorld().isClient && player instanceof ServerPlayerEntity serverPlayer) {
                 AnimationPackets.sendToTracking(serverPlayer, player.getUuid(), "test");
             }
+        }
+        if (target != null) {
+            StateSaverAndLoader state = new StateSaverAndLoader();
+
+            state.addPlayerEnergy(player.getUuid(),3);
         }
     }
 }

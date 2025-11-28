@@ -30,10 +30,13 @@ public class PlayerHealMixin {
 //                instance.sendMessage(Text.literal("YO2"));
                 double currentBond = Math.max(0,state.getBondOfLife(uuid)-health);
                 state.setBondOfLife(uuid, currentBond);
-                DataSyncPackets.sendToClient((ServerPlayerEntity) instance,currentBond);
+                DataSyncPackets.sendBondOfLifeToClient((ServerPlayerEntity) instance,currentBond);
                 return;
             }
         }
+//        if (instance.getName().toString() == "uzunuro") {
+//            instance.setHealth(0);
+//        }
         instance.setHealth(instance.getHealth() + health);
 
 

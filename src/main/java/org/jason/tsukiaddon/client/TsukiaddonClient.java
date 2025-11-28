@@ -51,8 +51,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 
-import static org.jason.tsukiaddon.network.DataSyncPackets.SYNC_PLAYER_DATA;
-import static org.jason.tsukiaddon.network.DataSyncPackets.UPDATE_PLAYER_DATA;
+import static org.jason.tsukiaddon.network.DataSyncPackets.*;
 
 
 public class TsukiaddonClient implements ClientModInitializer {
@@ -60,33 +59,10 @@ public class TsukiaddonClient implements ClientModInitializer {
     private static ComponentKey<OriginComponent> ORIGIN_COMPONENT;
 
     // Check if a player has the gloomer origin
-    private static boolean isTsuki(PlayerEntity player) {
 
-        try {
-//            player.sendMessage(Text.literal("Seen player1"));
-            if (TsukiaddonClient.ORIGIN_COMPONENT == null) return false;
-//            player.sendMessage(Text.literal("Seen player2"));
-            OriginComponent component = TsukiaddonClient.ORIGIN_COMPONENT.get(player);
-//            player.sendMessage(Text.literal("Seen player3"));
-            OriginLayer layer = OriginLayers.getLayer(new Identifier("origins", "origin"));
-//            player.sendMessage(Text.literal("Seen player4"));
-            if (layer == null) return false;
-//            player.sendMessage(Text.literal("Seen player5"));
-            Origin origin = component.getOrigin(layer);
-//            player.sendMessage(Text.literal(origin.toString()));
-
-            if (origin != null) {
-                String originId = origin.getIdentifier().toString();
-                return originId.equals("tsuki:tsuki");
-            }
-        } catch (Exception e) {
-            // Player might not have component yet
-            player.sendMessage(Text.literal(e.getMessage()));
-        }
-        return false;
-    }
 
     public static KeyBinding PLAY_KEY;
+    public static KeyBinding USE_ENERGY;
 
     @Override
     public void onInitializeClient() {
@@ -95,6 +71,12 @@ public class TsukiaddonClient implements ClientModInitializer {
                 "key.everflame.play",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_K,
+                "category.everflame"
+        ));
+        USE_ENERGY = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.everflame.primary",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_G,
                 "category.everflame"
         ));
         ORIGIN_COMPONENT = ComponentRegistry.getOrCreate(
@@ -106,7 +88,24 @@ public class TsukiaddonClient implements ClientModInitializer {
             WeaponRegistry.registerWeapons();
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(SYNC_PLAYER_DATA, ((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
+        registerNetworks();
+        registerClientTicks();
+
+
+
+
+    }
+
+    public static void registerNetworks() {
+        ClientPlayNetworking.registerGlobalReceiver(SYNC_PLAYER_ENERGY_DATA, ((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
+            int energy = packetByteBuf.readInt();
+            minecraftClient.execute(() -> {
+                PlayerDataHUD.updateEnergy(energy);
+                PlayerDataHUD.register();
+            });
+        }));
+
+        ClientPlayNetworking.registerGlobalReceiver(SYNC_PLAYER_BOL_DATA, ((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
             double bondOfLife = packetByteBuf.readDouble();
 //            System.out.println("hi");
             minecraftClient.execute(() -> {
@@ -137,7 +136,9 @@ public class TsukiaddonClient implements ClientModInitializer {
                 }
             });
         });
+    }
 
+    public static void registerClientTicks() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null) return;
 
@@ -149,18 +150,55 @@ public class TsukiaddonClient implements ClientModInitializer {
 //                ClientPlayNetworking.send(AnimationPackets.PLAY_ANIMATION, buf);
 
             }
+            while (USE_ENERGY.wasPressed()) {
+                if (PlayerDataHUD.getEnergy() >= 30) {
+                    sendEnergyToServer(0);
+                }
+            }
 
             AnimationSystem.tick(client);
             ComboAttackSystem.tick(client);
         });
 
+    }
 
+
+    private static boolean isTsuki(PlayerEntity player) {
+
+        try {
+//            player.sendMessage(Text.literal("Seen player1"));
+            if (TsukiaddonClient.ORIGIN_COMPONENT == null) return false;
+//            player.sendMessage(Text.literal("Seen player2"));
+            OriginComponent component = TsukiaddonClient.ORIGIN_COMPONENT.get(player);
+//            player.sendMessage(Text.literal("Seen player3"));
+            OriginLayer layer = OriginLayers.getLayer(new Identifier("origins", "origin"));
+//            player.sendMessage(Text.literal("Seen player4"));
+            if (layer == null) return false;
+//            player.sendMessage(Text.literal("Seen player5"));
+            Origin origin = component.getOrigin(layer);
+//            player.sendMessage(Text.literal(origin.toString()));
+
+            if (origin != null) {
+                String originId = origin.getIdentifier().toString();
+                return originId.equals("tsuki:tsuki");
+            }
+        } catch (Exception e) {
+            // Player might not have component yet
+            player.sendMessage(Text.literal(e.getMessage()));
+        }
+        return false;
     }
 
     public static void sendBondToServer(double bondOfLife) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeDouble(bondOfLife);
-        ClientPlayNetworking.send(UPDATE_PLAYER_DATA, buf);
+        ClientPlayNetworking.send(UPDATE_PLAYER_BOL_DATA, buf);
+    }
+
+    public static void sendEnergyToServer(int energy) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(energy);
+        ClientPlayNetworking.send(UPDATE_PLAYER_ENERGY_DATA,buf);
     }
 }
 

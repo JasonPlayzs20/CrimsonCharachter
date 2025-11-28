@@ -11,7 +11,8 @@ import org.jason.tsukiaddon.network.AnimationPackets;
 
 import java.util.UUID;
 
-import static org.jason.tsukiaddon.network.DataSyncPackets.UPDATE_PLAYER_DATA;
+import static org.jason.tsukiaddon.network.DataSyncPackets.UPDATE_PLAYER_BOL_DATA;
+import static org.jason.tsukiaddon.network.DataSyncPackets.UPDATE_PLAYER_ENERGY_DATA;
 
 public class Tsukiaddon implements ModInitializer {
     public static String MOD_ID = "tsukiaddon";
@@ -35,14 +36,25 @@ public class Tsukiaddon implements ModInitializer {
                 }
             });
         });
+        registerNetworks();
 
-        ServerPlayNetworking.registerGlobalReceiver(UPDATE_PLAYER_DATA, ((minecraftServer, serverPlayerEntity, serverPlayNetworkHandler, packetByteBuf, packetSender) -> {
+    }
+
+    public static void registerNetworks() {
+        ServerPlayNetworking.registerGlobalReceiver(UPDATE_PLAYER_BOL_DATA, ((minecraftServer, serverPlayerEntity, serverPlayNetworkHandler, packetByteBuf, packetSender) -> {
             double bondOfLife = packetByteBuf.readDouble();
 
             StateSaverAndLoader stateSaverAndLoader = StateSaverAndLoader.getServerState(minecraftServer);
             stateSaverAndLoader.setBondOfLife(serverPlayerEntity.getUuid(),bondOfLife);
             PlayerDataHUD.updateBondOfLife(bondOfLife);
 
+        }));
+
+        ServerPlayNetworking.registerGlobalReceiver(UPDATE_PLAYER_ENERGY_DATA,((minecraftServer, serverPlayerEntity, serverPlayNetworkHandler, packetByteBuf, packetSender) -> {
+            int energy = packetByteBuf.readInt();
+            StateSaverAndLoader stateSaverAndLoader = StateSaverAndLoader.getServerState(minecraftServer);
+            stateSaverAndLoader.setPlayerEnergy(serverPlayerEntity.getUuid(),energy);
+            PlayerDataHUD.updateEnergy(energy);
         }));
 
     }
