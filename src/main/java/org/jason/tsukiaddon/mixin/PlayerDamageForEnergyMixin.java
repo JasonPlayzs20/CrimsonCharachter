@@ -2,7 +2,11 @@ package org.jason.tsukiaddon.mixin;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jason.tsukiaddon.StateSaverAndLoader;
@@ -24,19 +28,28 @@ public abstract class PlayerDamageForEnergyMixin {
 
     @Shadow @Nullable protected PlayerEntity attackingPlayer;
 
-    @Inject(method = "damage",at = @At(value = "RETURN"))
+    @Inject(method = "damage", at = @At(value = "RETURN"))
     private void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity livingEntity = (LivingEntity) (Object) this;
-        if (livingEntity.getAttacker() instanceof PlayerEntity) {
-            System.out.println(livingEntity);
+        if (livingEntity.getAttacker() instanceof PlayerEntity attacker) {
             if (livingEntity.getServer() != null) {
                 MinecraftServer server = livingEntity.getServer();
 
+                RegistryKey<DamageType> fireKey = DamageTypes.LAVA;
+
+                System.out.println(source);
+
+                if (source.getTypeRegistryEntry().matchesKey(fireKey)) {
+                    System.out.println("FIRE DAMAGE - SKIPPING");
+                    return;
+                }
+
+//                System.out.println("HIUOIHF");
+
                 StateSaverAndLoader state = StateSaverAndLoader.getServerState(server);
-                state.addPlayerEnergy(attacker.getUuid(), (int) (amount * 0.4));
+                state.addPlayerEnergy(attacker.getUuid(), (int) (amount * 0.5));
                 DataSyncPackets.sendEnergyToClient((ServerPlayerEntity) attacker, state.getPlayerEnergy(attacker.getUuid()));
             }
         }
-
     }
 }

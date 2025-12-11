@@ -116,6 +116,13 @@ public class TsukiaddonClient implements ClientModInitializer {
             });
 
         }));
+        ClientPlayNetworking.registerGlobalReceiver(SYNC_PLAYER_ACTIVATED_DATA, ((minecraftClient, clientPlayNetworkHandler, packetByteBuf, packetSender) -> {
+            boolean activated = packetByteBuf.readBoolean();
+            minecraftClient.execute(() -> {
+                PlayerDataHUD.setActivated(activated);
+                PlayerDataHUD.register();
+            });
+        }));
         PlayerDataHUD.register();
 
         ClientPlayNetworking.registerGlobalReceiver(AnimationPackets.PLAY_ANIMATION, (client, handler, buf, responseSender) -> {
@@ -143,7 +150,9 @@ public class TsukiaddonClient implements ClientModInitializer {
             if (client.player == null) return;
 
             while (PLAY_KEY.wasPressed()) {
-                sendBondToServer(PlayerDataHUD.getBondOfLife() + 5);
+                PlayerDataHUD.updateEnergy(PlayerDataHUD.getEnergy()+10);
+                sendEnergyToServer(PlayerDataHUD.getEnergy());
+
 //                PacketByteBuf buf = PacketByteBufs.create();
 //                buf.writeUuid(client.player.getUuid());
 //                buf.writeString("test");
@@ -152,7 +161,14 @@ public class TsukiaddonClient implements ClientModInitializer {
             }
             while (USE_ENERGY.wasPressed()) {
                 if (PlayerDataHUD.getEnergy() >= 30) {
-                    sendEnergyToServer(0);
+                    if (PlayerDataHUD.getActivated()) {
+                        sendEnergyToServer(0);
+                    } else {
+                        sendEnergyToServer(PlayerDataHUD.getEnergy()/2);
+
+                    }
+                    PlayerDataHUD.flipActivated();
+                    sendActivatedToServer(PlayerDataHUD.getActivated());
                 }
             }
 
@@ -199,6 +215,12 @@ public class TsukiaddonClient implements ClientModInitializer {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeInt(energy);
         ClientPlayNetworking.send(UPDATE_PLAYER_ENERGY_DATA,buf);
+    }
+
+    public static void sendActivatedToServer(boolean activated) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBoolean(activated);
+        ClientPlayNetworking.send(UPDATE_PLAYER_ACTIVATED_DATA, buf);
     }
 }
 

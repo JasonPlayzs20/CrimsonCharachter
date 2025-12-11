@@ -5,8 +5,10 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 
 public class PlayerDataHUD {
-    private static double bondOfLife = 10.0;
+    private static double bondOfLife = 0.0;
     private static int energy = 0;
+    private static boolean activated = false;
+
 
     public static void register() {
 //        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
@@ -16,7 +18,7 @@ public class PlayerDataHUD {
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.options.hudHidden) return;
 
-            String bondOfLifeText = "Bond Of Life: " + bondOfLife;
+            String bondOfLifeText = "Bond Of Life: " + Math.round(bondOfLife*100.0)/100.0;
             drawContext.drawText(
                     client.textRenderer,
                     bondOfLifeText,
@@ -30,7 +32,17 @@ public class PlayerDataHUD {
             drawContext.drawText(
                     client.textRenderer,
                     energyText,
-                    100,
+                    130,
+                    10,
+                    0xFF4444,
+                    true
+            );
+
+            String activatedText = "Activated: " + activated;
+            drawContext.drawText(
+                    client.textRenderer,
+                    activatedText,
+                    200,
                     10,
                     0xFF4444,
                     true
@@ -38,6 +50,17 @@ public class PlayerDataHUD {
 
         }));
 
+    }
+
+    public static boolean getActivated() {
+        return activated;
+    }
+
+    public static void flipActivated() {
+        activated = !activated;
+    }
+    public static void setActivated(boolean activateds) {
+        activated = activateds;
     }
 
     public static void updateEnergy(int energyValue) {
@@ -56,5 +79,6 @@ public class PlayerDataHUD {
     public static double getBondOfLife() {
         return bondOfLife;
     }
+
 
 }

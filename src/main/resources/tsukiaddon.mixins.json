@@ -4,7 +4,9 @@
   "package": "org.jason.tsukiaddon.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "BondFireAttackMixin",
     "MinecraftClientMixin",
+    "PlayerAttackMixin",
     "PlayerDamageForEnergyMixin",
     "PlayerHealMixin"
   ],

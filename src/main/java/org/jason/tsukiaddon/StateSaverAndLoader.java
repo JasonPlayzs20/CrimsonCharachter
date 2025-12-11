@@ -18,6 +18,8 @@ public class StateSaverAndLoader extends PersistentState {
 
     public HashMap<UUID,Integer> playerEnergy = new HashMap<>();
 
+    public HashMap<UUID,Boolean> playerActivated = new HashMap<>();
+
 
     public StateSaverAndLoader() {
         super();
@@ -53,7 +55,13 @@ public class StateSaverAndLoader extends PersistentState {
         });
         nbt.put("energy", energyNbt);
         
-        
+        NbtCompound activatedNbt = new NbtCompound();
+        playerActivated.forEach((uuid, activated) -> {
+            activatedNbt.putBoolean(uuid.toString(), activated);
+        });
+        nbt.put("activated", activatedNbt);
+
+
         return nbt;
 
     }
@@ -74,6 +82,13 @@ public class StateSaverAndLoader extends PersistentState {
             int energy = energyNbt.getInt(key);
             state.playerEnergy.put(uuid,energy);
         });
+
+        NbtCompound activatedNbt = nbt.getCompound("activated");
+        activatedNbt.getKeys().forEach(key -> {
+            UUID uuid = UUID.fromString(key);
+            boolean activated = activatedNbt.getBoolean(key);
+            state.playerActivated.put(uuid, activated);
+        });
 //        state.bondOfLife = nbt.getDouble("bondOfLife");
         return state;
     }
@@ -88,12 +103,26 @@ public class StateSaverAndLoader extends PersistentState {
         );
     }
 
+
+    public boolean getActivated(UUID player) {
+        return playerActivated.getOrDefault(player,false);
+    }
+
+    public void toggleActivated(UUID player) {
+        playerActivated.put(player,!playerActivated.get(player));
+        markDirty();
+    }
+    public void setActivated(UUID player, boolean value) {
+        playerActivated.put(player,value);
+        markDirty();
+    }
+
     public double getBondOfLife(UUID player) {
-        return playerBondOfLife.getOrDefault(player,10.0);
+        return playerBondOfLife.getOrDefault(player,0.0);
     }
 
     public void setBondOfLife(UUID player, double value) {
-        playerBondOfLife.put(player,value);
+        playerBondOfLife.put(player,Math.min(value,20));
         markDirty();
     }
 

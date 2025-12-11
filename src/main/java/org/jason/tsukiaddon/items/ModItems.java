@@ -38,6 +38,9 @@ public class ModItems {
     public static final Item crystalOfAscension = register(new Item(new FabricItemSettings()),"crystal_of_ascension");
     public static final Item netherheartCatalyst = register(new Item(new FabricItemSettings()),"netherheart_catalyst");
 
+    public static final Item soulsblessing = register(new Item(new FabricItemSettings()),"soulsblessing");
+    public static final Item nightsoulblessing = register(new Item(new FabricItemSettings()),"nightsoulblessing");
+
 
     public static void initialize() {
         Registry.register(Registries.ITEM_GROUP, tsukiGroupKey, TSUKI_GROUP);
@@ -51,6 +54,8 @@ public class ModItems {
             itemgroup.add(coreOfIronflame);
             itemgroup.add(crystalOfAscension);
             itemgroup.add(netherheartCatalyst);
+            itemgroup.add(soulsblessing);
+            itemgroup.add(nightsoulblessing);
         });
     }
 }
